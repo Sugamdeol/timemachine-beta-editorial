@@ -7,14 +7,12 @@ import { useTheme } from '../../context/ThemeContext';
 interface StageModeProps {
   messages: Message[];
   currentPersona: keyof typeof AI_PERSONAS;
-  streamingMessageId: number | null;
   onMessageAnimated: (messageId: number) => void;
 }
 
 export function StageMode({ 
   messages, 
   currentPersona, 
-  streamingMessageId,
   onMessageAnimated 
 }: StageModeProps) {
   const { theme } = useTheme();
@@ -30,7 +28,6 @@ export function StageMode({
             isChatMode={false}
             onAnimationComplete={onMessageAnimated}
             currentPersona={currentPersona}
-            isStreaming={lastMessage.id === streamingMessageId}
           />
         </div>
       </div>

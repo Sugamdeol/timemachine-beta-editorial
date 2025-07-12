@@ -3,7 +3,7 @@ export interface Message {
   content: string;
   isAI: boolean;
   hasAnimated?: boolean;
-  thinking?: string;
+  isStreaming?: boolean;
   imageData?: string | string[]; // Add imageData field
 }
 
@@ -33,6 +33,6 @@ export interface MessageProps {
   isLoading?: boolean;
   hasAnimated?: boolean;
   onAnimationComplete?: () => void;
-  thinking?: string;
   imageData?: string | string[];
+  isStreaming?: boolean;
 }

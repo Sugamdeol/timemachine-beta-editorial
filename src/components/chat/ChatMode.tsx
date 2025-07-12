@@ -7,7 +7,6 @@ import { useTheme } from '../../context/ThemeContext';
 interface ChatModeProps {
   messages: Message[];
   currentPersona: keyof typeof AI_PERSONAS;
-  streamingMessageId: number | null;
   onMessageAnimated: (messageId: number) => void;
   error?: string | null;
 }
@@ -15,7 +14,6 @@ interface ChatModeProps {
 export function ChatMode({ 
   messages, 
   currentPersona, 
-  streamingMessageId,
   onMessageAnimated,
   error 
 }: ChatModeProps) {
@@ -43,11 +41,11 @@ export function ChatMode({
       const lastMessage = messages[messages.length - 1];
       if (!lastMessage.isAI) {
         lastUserMessageRef.current?.scrollIntoView({ behavior: "smooth" });
-      } else if (!streamingMessageId) {
+      } else {
         scrollToMessage();
       }
     }
-  }, [messages, streamingMessageId]);
+  }, [messages]);
 
   return (
     <div className={`min-h-full pt-20 pb-48 ${theme.text}`}>
@@ -71,7 +69,6 @@ export function ChatMode({
                   isChatMode={true}
                   onAnimationComplete={onMessageAnimated}
                   currentPersona={currentPersona}
-                  isStreaming={message.id === streamingMessageId}
                   previousMessage={previousMessage}
                 />
               </div>

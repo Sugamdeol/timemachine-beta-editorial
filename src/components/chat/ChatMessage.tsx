@@ -5,34 +5,32 @@ import { Message } from '../../types/chat';
 import { AI_PERSONAS } from '../../config/constants';
 
 interface ChatMessageProps extends Message {
-  isChatMode: boolean;
   onAnimationComplete: (messageId: number) => void;
   currentPersona: keyof typeof AI_PERSONAS;
   previousMessage?: string | null;
 }
 
-export function ChatMessage({ 
+export const ChatMessage = ({
   content, 
-  thinking, 
   isAI, 
   isChatMode, 
   id, 
   hasAnimated, 
-  onAnimationComplete, 
+  isStreaming,
+  onAnimationComplete,
   currentPersona,
   previousMessage,
   imageData
-}: ChatMessageProps) {
+}: ChatMessageProps) => {
   if (isAI) {
     return (
       <AIMessage 
-        content={content} 
-        thinking={thinking}
+        content={content}
         isChatMode={isChatMode} 
         messageId={id}
         hasAnimated={hasAnimated}
+        isStreaming={isStreaming}
         onAnimationComplete={onAnimationComplete}
-        currentPersona={currentPersona}
         previousMessage={previousMessage}
       />
     );
