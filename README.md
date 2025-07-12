@@ -1,5 +1,7 @@
 # TimeMachine
 
-Beta Release:
+Editorial board updates:
 
-Beta 1 Preview: (02-07-2025)
+13-07-2025 - Entire repo migrated to Pollinations.ai based
+02-07-2025 - Cloned TimeMachine Beta to editorial repo
+
