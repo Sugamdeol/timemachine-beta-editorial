@@ -1,5 +1,6 @@
 import { Message } from '../../types/chat';
 import { AI_PERSONAS, POLLINATIONS_API_TOKEN } from '../../config/constants';
+import { convertFilesToUrlsForPollinations } from '../imageUploadService';
 
 interface StreamUpdateCallback {
   (content: string, isDone: boolean): void;
@@ -59,7 +60,7 @@ interface ImageGenerationParams {
   height?: number;
 }
 
-function generateImageUrl(params: ImageGenerationParams): string {
+function generateImageUrl(params: ImageGenerationParams, referenceImageUrl?: string): string {
   const {
     prompt,
     width = 1080,
@@ -69,11 +70,18 @@ function generateImageUrl(params: ImageGenerationParams): string {
   const encodedPrompt = encodeURIComponent(prompt);
   const hardcodedToken = POLLINATIONS_API_TOKEN || "Cf5zT0TTvLLEskfY";
   
-  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&enhance=true&nologo=true&model=gptimage&token=${hardcodedToken}`;
+  let url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&enhance=true&nologo=true&model=gptimage&token=${hardcodedToken}`;
+  
+  // Add reference image if available
+  if (referenceImageUrl) {
+    url += `&image=${encodeURIComponent(referenceImageUrl)}`;
+  }
+  
+  return url;
 }
 
-function createImageMarkdown(params: ImageGenerationParams): string {
-  const imageUrl = generateImageUrl(params);
+function createImageMarkdown(params: ImageGenerationParams, referenceImageUrl?: string): string {
+  const imageUrl = generateImageUrl(params, referenceImageUrl);
   return `![Generated Image](${imageUrl})`;
 }
 
@@ -83,7 +91,8 @@ export async function generateAIResponse(
   systemPrompt: string = '', // Not used anymore, kept for compatibility
   currentPersona: keyof typeof AI_PERSONAS = 'default',
   onStreamUpdate: StreamUpdateCallback,
-  onError: ErrorCallback
+  onError: ErrorCallback,
+  originalImageFiles?: File[] // New optional parameter for original File objects
 ): Promise<void> {
   try {
     const personaConfig = AI_PERSONAS[currentPersona];
@@ -162,7 +171,19 @@ export async function generateAIResponse(
                 if (toolCall.function?.name === 'generate_image') {
                   try {
                     const params: ImageGenerationParams = JSON.parse(toolCall.function.arguments);
-                    const imageMarkdown = createImageMarkdown(params);
+                    
+                    // NEW: If we have original image files, upload the first one for reference
+                    let referenceImageUrl: string | undefined;
+                    if (originalImageFiles && originalImageFiles.length > 0) {
+                      try {
+                        const urls = await convertFilesToUrlsForPollinations([originalImageFiles[0]]);
+                        referenceImageUrl = urls[0];
+                      } catch (uploadError) {
+                        console.warn('Failed to upload reference image, generating without reference:', uploadError);
+                      }
+                    }
+                    
+                    const imageMarkdown = createImageMarkdown(params, referenceImageUrl);
                     accumulatedContent += `\n\n${imageMarkdown}`;
                     onStreamUpdate(accumulatedContent, false);
                   } catch (error) {
