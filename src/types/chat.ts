@@ -14,12 +14,12 @@ export interface ChatState {
 }
 
 export interface ChatActions {
-  handleSendMessage: (message: string, imageData?: string) => Promise<void>;
+  handleSendMessage: (message: string, imageData?: string | string[], originalFiles?: File[]) => Promise<void>;
   setChatMode: (isChatMode: boolean) => void;
 }
 
 export interface ChatInputProps {
-  onSendMessage: (message: string, imageData?: string) => Promise<void>;
+  onSendMessage: (message: string, imageData?: string | string[], originalFiles?: File[]) => Promise<void>;
   isLoading?: boolean;
 }
 

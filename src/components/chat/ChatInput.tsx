@@ -53,6 +53,7 @@ export function ChatInput({ onSendMessage, isLoading, currentPersona = 'default'
   const [message, setMessage] = useState('');
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [originalImageFiles, setOriginalImageFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [showMentionCall, setShowMentionCall] = useState(false);
@@ -94,9 +95,10 @@ export function ChatInput({ onSendMessage, isLoading, currentPersona = 'default'
         setIsUploading(true);
         try {
           const base64Images = await Promise.all(selectedImages.map(convertImageToBase64));
-          await onSendMessage(message, base64Images);
+          await onSendMessage(message, base64Images, originalImageFiles);
           setSelectedImages([]);
           setImagePreviewUrls([]);
+          setOriginalImageFiles([]);
         } catch (error) {
           alert('Failed to process images. Please try again.');
           console.error('Error processing images:', error);
@@ -155,6 +157,7 @@ export function ChatInput({ onSendMessage, isLoading, currentPersona = 'default'
       return;
     }
     setSelectedImages(validImageFiles);
+    setOriginalImageFiles(validImageFiles);
     const urls = validImageFiles.map(file => URL.createObjectURL(file));
     setImagePreviewUrls(urls);
 
@@ -162,9 +165,10 @@ export function ChatInput({ onSendMessage, isLoading, currentPersona = 'default'
       setIsUploading(true);
       try {
         const base64Images = await Promise.all(validImageFiles.map(convertImageToBase64));
-        await onSendMessage('', base64Images);
+        await onSendMessage('', base64Images, validImageFiles);
         setSelectedImages([]);
         setImagePreviewUrls([]);
+        setOriginalImageFiles([]);
       } catch (error) {
         alert('Failed to process images. Please try again.');
         console.error('Error processing images:', error);
@@ -196,15 +200,17 @@ export function ChatInput({ onSendMessage, isLoading, currentPersona = 'default'
     }
     setSelectedImages(validImageFiles);
     const urls = validImageFiles.map(file => URL.createObjectURL(file));
+    setOriginalImageFiles(validImageFiles);
     setImagePreviewUrls(urls);
 
     if (currentPersona !== 'default') {
       setIsUploading(true);
       try {
         const base64Images = await Promise.all(validImageFiles.map(convertImageToBase64));
-        await onSendMessage('', base64Images);
+        await onSendMessage('', base64Images, validImageFiles);
         setSelectedImages([]);
         setImagePreviewUrls([]);
+        setOriginalImageFiles([]);
       } catch (error) {
         alert('Failed to process images. Please try again.');
         console.error('Error processing images:', error);
